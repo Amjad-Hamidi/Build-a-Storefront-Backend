@@ -6,13 +6,30 @@ const router = express.Router();
 const productModel = new ProductModel();
 
 router.get("/", async (_req: Request, res: Response) => {
-  const products = await productModel.index();
-  res.json(products);
+  try {
+    const products = await productModel.index();
+    res.json(products);
+  } catch (err) {
+    res.status(500).json({ error: `Could not retrieve products. ${err}` });
+  }
+});
+
+router.get("/top", async (_req: Request, res: Response) => {
+  try {
+    const products = await productModel.topFive();
+    res.json(products);
+  } catch (err) {
+    res.status(500).json({ error: `Could not retrieve top products. ${err}` });
+  }
 });
 
 router.get("/:id", async (req: Request, res: Response) => {
-  const product = await productModel.show(parseInt(req.params.id));
-  res.json(product);
+  try { 
+    const product = await productModel.show(parseInt(req.params.id));
+    res.json(product);
+  } catch (err) {
+    res.status(500).json({ error: `Could not retrieve product. ${err}` });
+  }
 });
 
 router.post("/", verifyAuthToken, async (req: Request, res: Response) => {
@@ -24,16 +41,15 @@ router.post("/", verifyAuthToken, async (req: Request, res: Response) => {
   }
 });
 
-router.get("/top", async (_req: Request, res: Response) => {
-  const products = await productModel.topFive();
-  res.json(products);
-});
 
 router.get("/category", async (req: Request, res: Response) => {
-  const category = req.query.name as string;
-  const products = await productModel.byCategory(category);
-  res.json(products);
+  try { 
+    const category = req.query.name as string;
+    const products = await productModel.byCategory(category);
+    res.json(products);
+  } catch (err) {
+    res.status(500).json({ error: `Could not retrieve products by category. ${err}` });
+  }
 });
-
 
 export default router;

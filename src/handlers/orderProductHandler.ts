@@ -1,26 +1,42 @@
-import express, { Request, Response } from "express";
+// src/handlers/orderProductHandler.ts
+
+import express, { Router, Request, Response } from 'express';
 import { OrderProductModel } from "../models/OrderProductModel";
-import jwt from "../middleware/auth";
+import verifyAuthToken from '../middleware/auth'; // يجب استيراد الـ middleware الخاص بك
 
-const router = express.Router();
-const opModel = new OrderProductModel();
+const orderProductModel = new OrderProductModel();
 
-router.post("/", jwt, async (req: Request, res: Response) => {
-  try {
-    const op = await opModel.addProduct(req.body);
-    res.json(op);
-  } catch (err) {
-    res.status(400).json(err);
-  }
-});
+// 1. تعريف الـ Router
+const orderProductRouter: Router = express.Router();
 
-router.get("/:order_id", jwt, async (req: Request, res: Response) => {
-  try {
-    const list = await opModel.show(parseInt(req.params.order_id));
-    res.json(list);
-  } catch (err) {
-    res.status(400).json(err);
-  }
-});
+// 2. 🔑 Handler لإضافة منتج للطلب (POST /order-products)
+const addProduct = async (req: Request, res: Response) => {
+    try {
+        const orderProduct = await orderProductModel.addProduct({
+            order_id: parseInt(req.body.order_id),
+            product_id: parseInt(req.body.product_id),
+            quantity: parseInt(req.body.quantity)
+        });
+        res.status(200).json(orderProduct); // 🔑 يجب أن تعيد 200 عند النجاح
+    } catch (err) {
+        res.status(500).json({ error: (err as Error).message });
+    }
+};
 
-export default router;
+// 3. 🔑 Handler لعرض منتجات طلب معين (GET /order-products/:order_id)
+const productsInOrder = async (req: Request, res: Response) => {
+    try {
+        const orderId = parseInt(req.params.order_id);
+        const products = await orderProductModel.show(orderId);
+        res.status(200).json(products);
+    } catch (err) {
+        res.status(500).json({ error: (err as Error).message });
+    }
+};
+
+// 4. ربط المسارات بالـ Router
+orderProductRouter.post('/', verifyAuthToken, addProduct);
+orderProductRouter.get('/:order_id', verifyAuthToken, productsInOrder); 
+
+// 5. التصدير الافتراضي
+export default orderProductRouter;

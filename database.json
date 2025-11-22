@@ -6,5 +6,13 @@
     "database": "store_db",
     "user": "postgres",
     "password": "postgres"
+  },
+  "test": {
+    "driver": "pg",
+    "host": "localhost",
+    "port": 5432,
+    "database": "store_db_test",
+    "user": "postgres",
+    "password": "postgres"
   }
 }

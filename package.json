@@ -6,8 +6,12 @@
   "scripts": {
     "start": "node src/server.ts",
     "watch": "tsc-watch --esModuleInterop src/server.ts --outDir ./dist --onSuccess \"node ./dist/server.js\"",
-    "test": "jasmine-ts",
-    "tsc": "tsc"
+    "test": "cross-env NODE_ENV=test jasmine-ts",
+    "tsc": "tsc",
+    "db:up": "db-migrate up",
+    "db:down": "db-migrate down",
+    "db:up:test": "db-migrate up -e test",
+    "db:down:test": "db-migrate down -e test"
   },
   "author": "Udacity",
   "license": "ISC",
@@ -29,9 +33,12 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.10.1",
     "@types/pg": "^7.14.11",
+    "@types/supertest": "^6.0.3",
+    "cross-env": "^10.1.0",
     "jasmine": "^3.6.4",
     "jasmine-spec-reporter": "^6.0.0",
     "jasmine-ts": "^0.3.0",
+    "supertest": "^7.1.4",
     "ts-node": "^9.1.1",
     "tsc-watch": "^4.2.9",
     "typescript": "^5.9.3"
